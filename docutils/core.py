@@ -179,8 +179,7 @@ class Publisher:
 
     def apply_transforms(self):
         self.document.transformer.populate_from_components(
-            (self.source, self.reader, self.reader.parser, self.writer,
-             self.destination))
+            (self.reader, self.reader.parser, self.writer))
         self.document.transformer.apply_transforms()
 
     def publish(self, argv=None, usage=None, description=None,

@@ -16,10 +16,9 @@ except:
     pass
 import re
 from types import UnicodeType
-from docutils import TransformSpec
 
 
-class Input(TransformSpec):
+class Input:
 
     """
     Abstract base class for input wrappers.
@@ -150,7 +149,7 @@ class Input(TransformSpec):
         return None
 
 
-class Output(TransformSpec):
+class Output:
 
     """
     Abstract base class for output wrappers.
