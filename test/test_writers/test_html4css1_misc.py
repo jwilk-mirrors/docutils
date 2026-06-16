@@ -87,6 +87,21 @@ second term:
                       result)
 
 
+class ImageTestCase(unittest.TestCase):
+
+    mys = {'_disable_config': True}
+
+    def test_object_fallback_escaping(self):
+        # The <object> fallback content is HTML text, not an attribute
+        # value, so the "alt" string must be encoded like the <img> "alt".
+        data = ('.. image:: player.swf\n'
+                '   :alt: <script>bang</script>\n')
+        result = core.publish_string(data, writer=html4css1.Writer(),
+                                     settings_overrides=self.mys)
+        self.assertNotIn(b'<script>bang</script>', result)
+        self.assertIn(b'&lt;script&gt;bang&lt;/script&gt;</object>', result)
+
+
 ham_css = relpath(DATA_ROOT/'ham.css')
 
 

@@ -282,6 +282,31 @@ class ImagesTestCase(unittest.TestCase):
         rv = self.translator.prepare_svg(self.svg_sample, image, atts)
         self.assertEqual(rv, self.expected)
 
+    def test_video_object_fallback_escaping(self):
+        # The <video> fallback link and <object> fallback content are HTML
+        # text, not attribute values, so the "alt" string and the URI must
+        # be encoded like they are for the regular <img> element.
+        data = ('.. image:: movie.mp4\n'
+                '   :alt: </a><script>boom</script>\n\n'
+                '.. image:: player.swf\n'
+                '   :alt: <script>bang</script>\n')
+        result = core.publish_string(
+            data, writer=html5_polyglot.Writer(),
+            settings_overrides={'_disable_config': True})
+        self.assertNotIn(b'<script>boom</script>', result)
+        self.assertNotIn(b'<script>bang</script>', result)
+        self.assertIn(b'&lt;/a&gt;&lt;script&gt;boom&lt;/script&gt;', result)
+        self.assertIn(b'&lt;script&gt;bang&lt;/script&gt;</object>', result)
+
+    def test_video_fallback_uri_escaping(self):
+        # The fallback link "href" must not allow an attribute breakout.
+        data = '.. image:: "><b>x.mp4\n'
+        result = core.publish_string(
+            data, writer=html5_polyglot.Writer(),
+            settings_overrides={'_disable_config': True})
+        self.assertNotIn(b'href=""><b>', result)
+        self.assertIn(b'href="&quot;&gt;&lt;b&gt;x.mp4"', result)
+
     def test_prepare_svg_syntax_variants(self):
         # parsing "style" declarations must be robust:
         svg_sample = '<svg style="width:3em"></svg>'

@@ -1201,12 +1201,13 @@ class HTMLTranslator(writers.DoctreeTranslator):
                 node['classes'].remove('controls')
                 atts['controls'] = 'controls'
             element = (self.starttag(node, "video", suffix, src=uri, **atts)
-                       + f'<a href="{node["uri"]}">{alt}</a>{suffix}'
+                       + f'<a href="{self.encode(node["uri"])}">'
+                       + f'{self.encode(alt)}</a>{suffix}'
                        + f'</video>{suffix}')
         elif mimetype == 'application/x-shockwave-flash':
             atts['type'] = mimetype
             element = (self.starttag(node, 'object', '', data=uri, **atts)
-                       + f'{alt}</object>{suffix}')
+                       + f'{self.encode(alt)}</object>{suffix}')
         elif element:  # embedded SVG, see above
             element += suffix
         else:
